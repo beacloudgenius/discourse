@@ -1,13 +1,18 @@
 #!/bin/bash -eux
 
+rm -rf ./data
+docker rm -f $(docker ps -aq)
+
 PG_PASSWORD=`cat /dev/random | base64 | head -c 20 | xargs`
 
-echo "DISCOURSE_SMTP_ADDRESS=${MAIL_HOST}" > env
+echo "DISCOURSE_SMTP_ADDRESS=smtp.postmarkapp.com" > env
 echo "DISCOURSE_SMTP_PORT=587" >> env
-echo "DISCOURSE_SMTP_USER_NAME=${MAIL_USER}" >> env
-echo "DISCOURSE_SMTP_PASSWORD=${MAIL_PASS}" >> env
+echo "DISCOURSE_SMTP_USER_NAME=bfc72900-91ef-4a6f-b9a6-7c204d31ca82" >> env
+echo "DISCOURSE_SMTP_PASSWORD=bfc72900-91ef-4a6f-b9a6-7c204d31ca82" >> env
 echo "POSTGRES_USER=discourse" >> env
 echo "POSTGRES_PASSWORD=${PG_PASSWORD}" >> env
 echo "DISCOURSE_DB_PASSWORD=${PG_PASSWORD}" >> env
+echo "VIRTUAL_HOST=forum.thecloudseminar.com" >> env
+echo "DISCOURSE_DEVELOPER_EMAILS=hello@email.thecloudseminar.com" >> env
 
-VIRTUAL_HOST=${URL} docker-compose run app bash -c "sleep 3 && rake db:migrate assets:precompile"
+docker-compose run app bash -c "sleep 10 && rake db:migrate assets:precompile"
